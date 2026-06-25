@@ -74,33 +74,36 @@ def train_one_epoch(
     scheduler  = None,
     use_mixup_cutmix: bool = True,
     mixup_prob: float = 0.5,
+    is_phase1: bool = False,
+    total_epochs: int = 100,
 ) -> tuple[float, float]:
     model.train()
     loss_meter = AverageMeter("loss")
     acc_meter  = AverageMeter("acc")
 
-    for i, (images, labels) in enumerate(loader):
-        images = images.to(device, non_blocking=True)
-        labels = labels.to(device, non_blocking=True)
-
-        lam = 1.0
-        labels_a = labels
-        labels_b = labels
-        if use_mixup_cutmix and random.random() < mixup_prob:
-            # Randomly choose between Mixup and Cutmix
-            if cfg.CUTMIX_ALPHA > 0 and random.random() < 0.5:
-                images, labels_a, labels_b, lam = cutmix_data(images, labels)
-            elif cfg.MIXUP_ALPHA > 0:
-                images, labels_a, labels_b, lam = mixup_data(images, labels)
-            labels = labels_a
-
-        optimizer.zero_grad()
-        outputs = model(images)
-
-        if lam < 1.0:
-            loss = mixup_criterion(criterion, outputs, labels, labels_b, lam)
+    for i, (images, targets) in enumerate(loader):
+        images, targets = images.to(device, non_blocking=True), targets.to(device, non_blocking=True)
+        
+        # Determine if we should apply MixUp/CutMix
+        # Disable in Phase 1 and disable in the last 20 epochs of Phase 2
+        apply_aug = True
+        if is_phase1:
+            apply_aug = False
+        if epoch >= total_epochs - 20:
+            apply_aug = False
+            
+        r = random.random()
+        if apply_aug and r < cfg.MIXUP_PROB:
+            images, targets_a, targets_b, lam = mixup_data(images, targets, cfg.MIXUP_ALPHA)
+            outputs = model(images)
+            loss = mixup_criterion(criterion, outputs, targets_a, targets_b, lam)
+        elif apply_aug and r < cfg.MIXUP_PROB + cfg.CUTMIX_PROB:
+            images, targets_a, targets_b, lam = cutmix_data(images, targets, cfg.CUTMIX_ALPHA)
+            outputs = model(images)
+            loss = mixup_criterion(criterion, outputs, targets_a, targets_b, lam)
         else:
-            loss = criterion(outputs, labels)
+            outputs = model(images)
+            loss = criterion(outputs, targets)
 
         loss.backward()
         nn.utils.clip_grad_norm_(model.parameters(), cfg.GRADIENT_CLIP)
@@ -109,7 +112,7 @@ def train_one_epoch(
         if scheduler is not None:
             scheduler.step(epoch + i / len(loader))
 
-        acc = top1_accuracy(outputs, labels)
+        acc = top1_accuracy(outputs, targets)
         loss_meter.update(loss.item(), images.size(0))
         acc_meter.update(acc,         images.size(0))
 
@@ -259,7 +262,10 @@ def main() -> None:
                 weight_decay=cfg.WEIGHT_DECAY,
             )
             scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(
-                optimizer, T_0=cfg.T0, T_mult=cfg.T_MULT, eta_min=1e-6
+                optimizer, 
+                T_0=20, 
+                T_mult=2, 
+                eta_min=1e-6
             )
 
         t0 = time.time()
@@ -271,8 +277,8 @@ def main() -> None:
             model, train_loader, optimizer, criterion, device,
             epoch=epoch,
             scheduler=scheduler,
-            use_mixup_cutmix=not args.no_mixup,
-            mixup_prob=0.5, # increased probability
+            is_phase1=(epoch < freeze_epochs),
+            total_epochs=args.epochs,
         )
         if len(val_loader) > 0:
             val_loss, val_acc = validate(model, val_loader, criterion, device)

@@ -98,12 +98,12 @@ def main() -> None:
         return
 
     print("=== Loading Large Model ===")
-    model_large = build_model(num_classes=cfg.NUM_CLASSES, pretrained=False, model_type="large")
-    ckpt_large = load_checkpoint(ckpt_large_path, model_large, device)
+    model_large = build_model(num_classes=cfg.NUM_CLASSES, pretrained=False, model_type="large").to(device)
+    ckpt_large = load_checkpoint(ckpt_large_path, model_large, device=device)
 
     print("=== Loading Small Model ===")
-    model_small = build_model(num_classes=cfg.NUM_CLASSES, pretrained=False, model_type="small")
-    ckpt_small = load_checkpoint(ckpt_small_path, model_small, device)
+    model_small = build_model(num_classes=cfg.NUM_CLASSES, pretrained=False, model_type="small").to(device)
+    ckpt_small = load_checkpoint(ckpt_small_path, model_small, device=device)
 
     idx_to_class = {v: k for k, v in ckpt_large["class_to_idx"].items()}
 

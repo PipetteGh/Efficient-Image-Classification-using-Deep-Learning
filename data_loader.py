@@ -71,7 +71,6 @@ def get_tta_transform(image_size: int = cfg.IMAGE_SIZE) -> transforms.Compose:
         transforms.Resize(int(image_size * 1.14)),
         transforms.RandomCrop(image_size),
         transforms.RandomHorizontalFlip(),
-        transforms.ColorJitter(brightness=0.1, contrast=0.1),
         transforms.ToTensor(),
         transforms.Normalize(mean=cfg.MEAN, std=cfg.STD),
     ])

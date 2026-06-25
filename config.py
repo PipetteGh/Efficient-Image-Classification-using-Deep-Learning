@@ -31,7 +31,7 @@ CLASS_NAMES = [
 NUM_CLASSES = len(CLASS_NAMES)            # 16
 
 # ─── Image Settings ───────────────────────────────────────────────────────────
-IMAGE_SIZE  = 288      # INCREASED for max detail
+IMAGE_SIZE  = 384      # INCREASED for max detail
 MEAN        = [0.485, 0.456, 0.406]      # ImageNet mean
 STD         = [0.229, 0.224, 0.225]      # ImageNet std
 

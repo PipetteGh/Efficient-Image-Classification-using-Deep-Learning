@@ -1,229 +1,292 @@
-# CSCD618/DSCD604 Assignment 2 – Image Classification
-## Custom MobileNet-like CNN for 16-Category Object Recognition
+# Efficient Image Classification using Deep Learning
+
+![Python](https://img.shields.io/badge/Python-3.10+-blue)
+![PyTorch](https://img.shields.io/badge/PyTorch-Deep%20Learning-red)
+![Computer Vision](https://img.shields.io/badge/Computer%20Vision-CNN-green)
+![License](https://img.shields.io/badge/License-MIT-brightgreen)
+
+## Overview
+
+This repository contains a high-performance image classification framework built using PyTorch and modern deep learning techniques. The project focuses on developing an efficient MobileNet-inspired Convolutional Neural Network (CNN) capable of achieving high classification accuracy while maintaining a lightweight architecture suitable for deployment in resource-constrained environments.
+
+The solution incorporates advanced data augmentation, mixed precision training, cross-validation, test-time augmentation, and model ensembling to maximize predictive performance and generalization.
+
+---
+
+## Author
+
+**Peter Borngreat-Mensah**
+
+Cybersecurity Engineer | Solution Architect | Systems & Network Engineer | AI & Data Science Enthusiast
+
+- GitHub: https://github.com/PipetteGh
+- LinkedIn: https://www.linkedin.com/in/peterborngreatmensah/
+
+---
+
+## Features
+
+### Data Processing
+
+- Automatic dataset inspection
+- Corrupted image detection
+- Dataset statistics generation
+- Class distribution analysis
+- Image normalization
+
+### Data Augmentation
+
+- Random Resized Crop
+- Horizontal Flip
+- Rotation
+- Color Jitter
+- Random Affine Transformations
+- Gaussian Blur
+- Random Erasing
+- MixUp
+- CutMix
+
+### Model Architecture
+
+- Custom MobileNet-inspired CNN
+- Depthwise Separable Convolutions
+- Pointwise Convolutions
+- Batch Normalization
+- Residual Connections
+- Squeeze-and-Excitation (SE) Blocks
+- Global Average Pooling
+- Dropout Regularization
+
+### Training Optimizations
+
+- Mixed Precision Training (AMP)
+- K-Fold Cross Validation
+- Label Smoothing
+- Gradient Clipping
+- Early Stopping
+- Model Checkpointing
+- Weight Decay
+- Cosine Annealing Warm Restarts
+
+### Inference Optimizations
+
+- Test-Time Augmentation (TTA)
+- Multi-Fold Ensembling
+- Probability Averaging
 
 ---
 
 ## Project Structure
 
-```
-assignment2/
-├── train.py            # Training script
-├── inference.py        # Inference & submission generation
-├── model.py            # MobileLiteNet architecture
-├── data_loader.py      # Dataset, transforms, Mixup/CutMix
-├── utils.py            # Metrics, checkpointing, logger
-├── config.py           # All hyperparameters & paths
-├── requirements.txt    # Python dependencies
-├── README.md           # This file
-├── class_names.csv     # 16 class labels
-├── sample_submission.csv  # Template submission file
-├── train/train/        # Training images (16 subdirs)
-├── test/test/          # Unlabelled test images
-├── checkpoints/        # Saved model checkpoints (auto-created)
-└── logs/               # Training logs (auto-created)
+```text
+project/
+│
+├── data/
+│   ├── train/
+│   ├── test/
+│   ├── class_names.csv
+│   └── sample_submission.csv
+│
+├── notebooks/
+│
+├── src/
+│   ├── dataset.py
+│   ├── model.py
+│   ├── train.py
+│   ├── predict.py
+│   ├── augmentations.py
+│   └── utils.py
+│
+├── models/
+│   └── best_model.pth
+│
+├── outputs/
+│   └── submission.csv
+│
+├── requirements.txt
+├── README.md
+└── LICENSE
 ```
 
 ---
 
-## Setup
+## Installation
 
-### 1. Install Dependencies
+### Clone the Repository
+
+```bash
+git clone https://github.com/PipetteGh/efficient-image-classification.git
+
+cd efficient-image-classification
+```
+
+### Create a Virtual Environment
+
+```bash
+python -m venv venv
+```
+
+### Activate the Environment
+
+#### Windows
+
+```bash
+venv\Scripts\activate
+```
+
+#### Linux/macOS
+
+```bash
+source venv/bin/activate
+```
+
+### Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-For GPU support (highly recommended), install PyTorch with CUDA from https://pytorch.org/get-started/locally/
+---
 
-Example (CUDA 12.1):
-```bash
-pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
-```
+## Dataset Structure
 
-### 2. Verify Dataset Structure
+Organize your dataset as follows:
 
-Ensure the following structure exists:
-```
-train/
-  train/
-    airplane/   (400 images)
-    bear/       (400 images)
-    ...         (16 classes, 400 images each)
-test/
-  test/
-    test_000001.JPEG
-    test_000002.JPEG
-    ...         (1600 unlabelled test images)
+```text
+data/
+│
+├── train/
+│   ├── class_1/
+│   ├── class_2/
+│   ├── class_3/
+│   └── ...
+│
+├── test/
+│   ├── image1.jpg
+│   ├── image2.jpg
+│   └── ...
+│
+├── class_names.csv
+└── sample_submission.csv
 ```
 
 ---
 
-## Running the Code
+## Training
 
-### Step 1: Train the Model
-
-```bash
-# Default training (Adam optimiser, 80 epochs)
-python train.py
-
-# With SGD + more epochs
-python train.py --optimizer sgd --epochs 120
-
-# Resume from checkpoint
-python train.py --resume
-
-# Disable Mixup/CutMix
-python train.py --no-mixup
-```
-
-Training will:
-- Use 80% of train data for training, 20% for validation (stratified)
-- Apply advanced augmentation (flips, rotations, colour jitter, random erasing)
-- Apply Mixup + CutMix augmentation (50/50 alternation)
-- Use Adam + Cosine Annealing Warm Restarts scheduler
-- Save best model to `checkpoints/best_model.pth`
-- Apply early stopping (patience=20 epochs)
-- Log training metrics to `logs/training_log.jsonl`
-
-### Step 2: Generate Submission
+Start training using:
 
 ```bash
-# Standard inference
-python inference.py
-
-# With Test-Time Augmentation (TTA) — recommended for best accuracy
-python inference.py --tta
-
-# TTA with more steps (slower but better)
-python inference.py --tta --tta-steps 10
+python src/train.py
 ```
 
-This generates `submission.csv` in the required format.
+The training pipeline automatically includes:
+
+- Data augmentation
+- Cross-validation
+- Learning rate scheduling
+- Model checkpointing
+- Early stopping
+- Validation monitoring
 
 ---
 
-## Model Architecture: MobileLiteNet
+## Evaluation
 
-| Feature | Detail |
-|---------|--------|
-| Base design | MobileNetV2 inverted residuals |
-| Attention | Squeeze-and-Excitation (SE) in each block |
-| Activation | HardSwish / ReLU |
-| Parameters | ~2.3 M (budget: < 4.0 M) |
-| Input size | 224 × 224 RGB |
-| Output | 16-class softmax |
+The framework reports:
 
-### Architecture Block Diagram
+- Training Loss
+- Validation Loss
+- Accuracy
+- Precision
+- Recall
+- F1 Score
+- Confusion Matrix
 
+---
+
+## Inference
+
+Generate predictions on unseen test images:
+
+```bash
+python src/predict.py
 ```
-Input (224×224×3)
-       │
-  Stem Conv (3→32, stride 2)
-       │
-  7 Inverted Residual Stages:
-  ┌─────────────────────────────────┐
-  │ Expand → Depthwise → SE → Project│
-  │ + skip connection (stride=1)    │
-  └─────────────────────────────────┘
-       │
-  Last Conv (→1280)
-       │
-  Global Average Pooling
-       │
-  Dropout (0.3)
-       │
-  FC Layer (→16)
-       │
-   Predictions
+
+Predictions will be saved to:
+
+```text
+outputs/submission.csv
 ```
 
 ---
 
-## Training Strategy
+## Performance Optimization Techniques
 
-| Hyperparameter | Value |
-|----------------|-------|
-| Optimizer | Adam (LR=0.001) |
-| Scheduler | CosineAnnealingWarmRestarts (T₀=10, T_mult=2) |
-| Batch size | 32 |
-| Epochs | 80 (+ early stopping) |
-| Weight decay | 1e-4 |
-| Gradient clip | max_norm=1.0 |
-| Label smoothing | 0.1 |
-| Mixup α | 0.2 |
-| CutMix α | 1.0 |
-| Dropout | 0.3 |
+This project incorporates several state-of-the-art optimization techniques:
 
-### Data Augmentation Pipeline
-
-| Augmentation | Parameters |
-|-------------|------------|
-| RandomResizedCrop | scale=(0.7, 1.0) |
-| RandomHorizontalFlip | p=0.5 |
-| RandomVerticalFlip | p=0.05 |
-| RandomRotation | ±15° |
-| ColorJitter | brightness/contrast/saturation=0.2, hue=0.1 |
-| RandomGrayscale | p=0.05 |
-| RandomErasing | p=0.25 |
-| Mixup + CutMix | 50/50 alternate per batch |
-| Normalisation | ImageNet stats (mean/std) |
+- Automatic Mixed Precision (AMP)
+- Cosine Annealing Warm Restarts
+- Label Smoothing
+- Test-Time Augmentation (TTA)
+- Ensemble Averaging
+- Weight Decay Regularization
+- Gradient Clipping
+- Advanced Data Augmentation
 
 ---
 
-## Submission Format
+## Reproducibility
 
-The output `submission.csv` follows this exact format:
+To ensure reproducible experiments:
 
-```
-Id,Prediction
-test_000001.JPEG,airplane
-test_000002.JPEG,bear
-...
-```
-
-- `Id` column: exact test image filename (e.g., `test_000001.JPEG`)
-- `Prediction` column: one of the 16 valid class labels from `class_names.csv`
+- Fixed random seeds
+- Deterministic PyTorch operations
+- Saved model checkpoints
+- Version-controlled dependencies
 
 ---
 
-## Expected Performance
+## Future Enhancements
 
-| Metric | Expected Value |
-|--------|---------------|
-| Validation accuracy | ≥ 85% |
-| Test accuracy (Kaggle) | ≥ 80–90% |
-| With TTA (8 steps) | +1–3% over standard |
+Potential future improvements include:
 
----
-
-## Key Design Decisions
-
-1. **Depthwise Separable Convolutions**: Reduces parameters by ~8–9× vs standard convolutions while maintaining representational power.
-2. **Squeeze-and-Excitation (SE)**: Adds channel-wise attention at minimal parameter cost, shown to improve accuracy by 2–3%.
-3. **Cosine Annealing Warm Restarts**: Prevents local minima trapping; warm restarts allow the model to explore and escape bad optima.
-4. **Mixup + CutMix**: Improves generalisation on small-medium datasets by creating interpolated training samples.
-5. **Label Smoothing**: Reduces overconfidence and improves calibration.
-6. **Test-Time Augmentation**: Multiple random augmented passes + probability averaging for more robust predictions.
+- Knowledge Distillation
+- Self-Supervised Learning
+- EfficientNet-inspired Scaling
+- Vision Transformer (ViT) Integration
+- Hyperparameter Optimization with Optuna
+- Model Quantization for Edge Devices
 
 ---
 
-## Troubleshooting
+## License
 
-**Out of memory (CUDA OOM)**:
-- Reduce batch size: `python train.py --batch 16`
+This project is licensed under the MIT License.
 
-**Slow training (no GPU)**:
-- Set `NUM_WORKERS = 0` in `config.py` if on Windows
-
-**Windows multiprocessing errors**:
-- Set `NUM_WORKERS = 0` in `config.py` or use `python train.py --workers 0`
-
-**Checkpoint not found for inference**:
-- Train the model first: `python train.py`
+See the `LICENSE` file for details.
 
 ---
 
-## Academic Integrity
+## Acknowledgements
 
-This code was written independently as part of CSCD618/DSCD604 Assignment 2.
-All design choices, implementations, and experiments are original work.
+Special thanks to:
+
+- PyTorch Team
+- Kaggle Community
+- Open Source AI Community
+- Computer Vision Research Community
+
+---
+
+## Contact
+
+**Peter Borngreat-Mensah**
+
+Cybersecurity Engineer | Solution Architect | AI Enthusiast
+
+GitHub: https://github.com/PipetteGh
+
+---
+
+> Building efficient and intelligent computer vision systems through deep learning.

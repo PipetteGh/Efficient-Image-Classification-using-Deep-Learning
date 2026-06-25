@@ -162,6 +162,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--workers",   type=int,   default=cfg.NUM_WORKERS)
     parser.add_argument("--freeze-epochs", type=int, default=cfg.FREEZE_EPOCHS,
                         help="Number of epochs to train with frozen backbone")
+    parser.add_argument("--model-type", type=str, default="large", choices=["large", "small"])
     return parser.parse_args()
 
 
@@ -187,7 +188,7 @@ def main() -> None:
     # ── Model ─────────────────────────────────────────────────────────────────
     print("\n[2/5] Building model …")
     model = build_model(num_classes=cfg.NUM_CLASSES, dropout=cfg.DROPOUT,
-                        pretrained=cfg.PRETRAINED)
+                        pretrained=cfg.PRETRAINED, model_type=args.model_type)
     
     total_params = count_all_parameters(model)
     print(f"      Total parameters: {total_params:,}  (budget: < 4,000,000)")
@@ -209,12 +210,10 @@ def main() -> None:
     # ── Optimizer (initially for frozen backbone) ─────────────────────────────
     print("\n[3/5] Configuring optimiser …")
     lr = cfg.FREEZE_LR if (cfg.PRETRAINED and freeze_epochs > 0) else args.lr
-    optimizer = torch.optim.SGD(
+    optimizer = torch.optim.AdamW(
         filter(lambda p: p.requires_grad, model.parameters()),
         lr=lr,
-        momentum=cfg.MOMENTUM,
         weight_decay=cfg.WEIGHT_DECAY,
-        nesterov=True,
     )
 
     scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(
@@ -224,12 +223,13 @@ def main() -> None:
     # ── Resume ────────────────────────────────────────────────────────────────
     start_epoch = 0
     best_val_acc = 0.0
-    if args.resume and os.path.exists(cfg.MODEL_CHECKPOINT):
-        print(f"\n[*] Resuming from {cfg.MODEL_CHECKPOINT}")
+    checkpoint_path = cfg.MODEL_CHECKPOINT.replace(".pth", f"_{args.model_type}.pth")
+    if args.resume and os.path.exists(checkpoint_path):
+        print(f"\n[*] Resuming from {checkpoint_path}")
         # Unfreeze underlying model before loading
         base_model = model
         base_model.unfreeze_backbone()   
-        ckpt = load_checkpoint(cfg.MODEL_CHECKPOINT, model,
+        ckpt = load_checkpoint(checkpoint_path, model,
                                optimizer, scheduler, device)
         start_epoch  = ckpt["epoch"] + 1
         best_val_acc = ckpt["val_acc"]
@@ -253,13 +253,10 @@ def main() -> None:
             trainable = count_parameters(model)
             print(f"      Trainable params (all): {trainable:,}")
 
-            # Create new optimizer with all parameters + lower LR
-            optimizer = torch.optim.SGD(
+            optimizer = torch.optim.AdamW(
                 model.parameters(),
                 lr=cfg.FINETUNE_LR,
-                momentum=cfg.MOMENTUM,
                 weight_decay=cfg.WEIGHT_DECAY,
-                nesterov=True,
             )
             scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(
                 optimizer, T_0=cfg.T0, T_mult=cfg.T_MULT, eta_min=1e-6
@@ -299,7 +296,7 @@ def main() -> None:
         if len(val_loader) == 0 or val_acc > best_val_acc:
             best_val_acc = val_acc if len(val_loader) > 0 else train_acc
             save_checkpoint(model, optimizer, scheduler, epoch,
-                            best_val_acc, class_to_idx, cfg.MODEL_CHECKPOINT)
+                            best_val_acc, class_to_idx, checkpoint_path)
             print(f"  [OK] New checkpoint saved")
 
         if len(val_loader) > 0 and early_stopper.step(val_acc):
@@ -308,7 +305,7 @@ def main() -> None:
 
     logger.close()
     print(f"\n[5/5] Training complete. Best val accuracy: {best_val_acc:.4f}")
-    print(f"      Checkpoint saved to: {cfg.MODEL_CHECKPOINT}")
+    print(f"      Checkpoint saved to: {checkpoint_path}")
 
 
 if __name__ == "__main__":

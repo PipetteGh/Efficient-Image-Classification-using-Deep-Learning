@@ -38,7 +38,7 @@ STD         = [0.229, 0.224, 0.225]      # ImageNet std
 # ─── Training Hyperparameters ─────────────────────────────────────────────────
 BATCH_SIZE       = 64       # Single GPU RTX 3060 12GB
 NUM_EPOCHS       = 60
-VAL_SPLIT        = 0.0      # 100% of data used for training
+VAL_SPLIT        = 0.15      # 15% validation split for local evaluation
 RANDOM_SEED      = 42
 NUM_WORKERS      = 4        # GPU-enabled, use multiple workers
 PIN_MEMORY       = True     # enable pin_memory for GPU
@@ -77,7 +77,7 @@ AUG_CROP_RATIO  = (0.85, 1.15) # tighter ratio
 # ─── Two-Phase Fine-tuning ───────────────────────────────────────────────────
 FREEZE_EPOCHS    = 5         # Phase 1: train only classifier for this many epochs
 FREEZE_LR        = 0.01      # higher LR for Phase 1 (only classifier weights)
-FINETUNE_LR      = 0.001     # LOWER LR for Phase 2 to preserve pretrained weights
+FINETUNE_LR      = 0.00005   # LOWER LR for Phase 2 to prevent Catastrophic Forgetting
 
 # ─── Test-Time Augmentation ───────────────────────────────────────────────────
 TTA_STEPS        = 16        # INCREASED for more robust predictions

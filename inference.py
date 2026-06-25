@@ -22,9 +22,8 @@ from utils import get_device, load_checkpoint, progress_bar
 
 
 @torch.no_grad()
-def predict_tta_ensemble(
-    model_large: torch.nn.Module,
-    model_small: torch.nn.Module,
+def predict_tta(
+    model: torch.nn.Module,
     test_dir: str,
     idx_to_class: dict[int, str],
     device: torch.device,
@@ -33,8 +32,7 @@ def predict_tta_ensemble(
     num_workers: int = cfg.NUM_WORKERS,
 ) -> tuple[list[str], list[str]]:
     
-    model_large.eval()
-    model_small.eval()
+    model.eval()
 
     # Get filenames
     std_loader = get_test_loader(test_dir, batch_size=batch_size, num_workers=num_workers, tta=False)
@@ -54,17 +52,14 @@ def predict_tta_ensemble(
         for images, _ in loader:
             images = images.to(device, non_blocking=True)
             
-            # Predict with both models
-            out_large = model_large(images)
-            out_small = model_small(images)
+            # Predict
+            out = model(images)
             
             # Average probabilities
-            prob_large = F.softmax(out_large, dim=1)
-            prob_small = F.softmax(out_small, dim=1)
-            avg_prob = (prob_large + prob_small) / 2.0
+            prob = F.softmax(out, dim=1)
             
-            bs = avg_prob.size(0)
-            accumulated[offset:offset + bs] += avg_prob
+            bs = prob.size(0)
+            accumulated[offset:offset + bs] += prob
             offset += bs
 
     preds = accumulated.argmax(dim=1).cpu().tolist()
@@ -90,26 +85,21 @@ def main() -> None:
     os.environ["CUDA_VISIBLE_DEVICES"] = "0"
     device = get_device()
 
-    ckpt_large_path = cfg.MODEL_CHECKPOINT.replace(".pth", "_large.pth")
-    ckpt_small_path = cfg.MODEL_CHECKPOINT.replace(".pth", "_small.pth")
+    ckpt_path = cfg.MODEL_CHECKPOINT.replace(".pth", "_large.pth")
 
-    if not (os.path.exists(ckpt_large_path) and os.path.exists(ckpt_small_path)):
-        print("Error: Could not find both _large.pth and _small.pth checkpoints.")
+    if not os.path.exists(ckpt_path):
+        print(f"Error: Could not find checkpoint {ckpt_path}.")
         return
 
-    print("=== Loading Large Model ===")
-    model_large = build_model(num_classes=cfg.NUM_CLASSES, pretrained=False, model_type="large").to(device)
-    ckpt_large = load_checkpoint(ckpt_large_path, model_large, device=device)
+    print("=== Loading Model ===")
+    model = build_model(num_classes=cfg.NUM_CLASSES, pretrained=False, model_type="large").to(device)
+    ckpt = load_checkpoint(ckpt_path, model, device=device)
 
-    print("=== Loading Small Model ===")
-    model_small = build_model(num_classes=cfg.NUM_CLASSES, pretrained=False, model_type="small").to(device)
-    ckpt_small = load_checkpoint(ckpt_small_path, model_small, device=device)
+    idx_to_class = {v: k for k, v in ckpt["class_to_idx"].items()}
 
-    idx_to_class = {v: k for k, v in ckpt_large["class_to_idx"].items()}
-
-    print("\n=== Running Ensemble Inference ===")
+    print("\n=== Running Inference ===")
     t0 = time.time()
-    fnames, preds = predict_tta_ensemble(model_large, model_small, cfg.TEST_DIR, idx_to_class, device)
+    fnames, preds = predict_tta(model, cfg.TEST_DIR, idx_to_class, device)
     
     print(f"\n  Inference completed in {time.time()-t0:.1f}s")
     build_submission(fnames, preds, idx_to_class)

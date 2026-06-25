@@ -31,14 +31,14 @@ CLASS_NAMES = [
 NUM_CLASSES = len(CLASS_NAMES)            # 16
 
 # ─── Image Settings ───────────────────────────────────────────────────────────
-IMAGE_SIZE  = 384      # INCREASED for max detail
+IMAGE_SIZE  = 224      # Native MobileNet resolution
 MEAN        = [0.485, 0.456, 0.406]      # ImageNet mean
 STD         = [0.229, 0.224, 0.225]      # ImageNet std
 
 # ─── Training Hyperparameters ─────────────────────────────────────────────────
 BATCH_SIZE       = 64       # Single GPU RTX 3060 12GB
-NUM_EPOCHS       = 60
-VAL_SPLIT        = 0.15      # 15% validation split for local evaluation
+NUM_EPOCHS       = 140      # INCREASED for proper warm restarts
+VAL_SPLIT        = 0.0       # Train on 100% of data for final submission
 RANDOM_SEED      = 42
 NUM_WORKERS      = 4        # GPU-enabled, use multiple workers
 PIN_MEMORY       = True     # enable pin_memory for GPU
@@ -57,8 +57,10 @@ T_MULT           = 2         # period multiplier
 
 # ─── Regularisation (Anti-Overfitting) ───────────────────────────────────────
 LABEL_SMOOTHING  = 0.1
+MIXUP_PROB       = 0.3       # REDUCED so model sees clean images
 MIXUP_ALPHA      = 0.2       # Soft Mixup for MobileNetV3-Large
-CUTMIX_ALPHA     = 0.0       # Disabled for tiny model
+CUTMIX_PROB      = 0.3       # REDUCED so model sees clean images
+CUTMIX_ALPHA     = 1.0       # Enabled for MobileNetV3-Large
 DROPOUT          = 0.2       # Reduced to let model properly fit
 
 # ─── Early Stopping ───────────────────────────────────────────────────────────
@@ -80,7 +82,7 @@ FREEZE_LR        = 0.01      # higher LR for Phase 1 (only classifier weights)
 FINETUNE_LR      = 0.00005   # LOWER LR for Phase 2 to prevent Catastrophic Forgetting
 
 # ─── Test-Time Augmentation ───────────────────────────────────────────────────
-TTA_STEPS        = 16        # INCREASED for more robust predictions
+TTA_STEPS        = 4         # Moderate TTA to prevent noise
 
 # ─── Model ────────────────────────────────────────────────────────────────────
 MODEL_CHECKPOINT = os.path.join(CHECKPOINT_DIR, "best_model.pth")

@@ -18,7 +18,7 @@ test_000016.JPEG,elephant
 test_000017.JPEG,boat
 test_000018.JPEG,bottle
 test_000019.JPEG,bird
-test_000020.JPEG,Knife
+test_000020.JPEG,cat
 test_000021.JPEG,truck
 test_000022.JPEG,bottle
 test_000023.JPEG,chair
@@ -115,7 +115,7 @@ test_000113.JPEG,Keyboard
 test_000114.JPEG,bottle
 test_000115.JPEG,car
 test_000116.JPEG,clock
-test_000117.JPEG,car
+test_000117.JPEG,truck
 test_000118.JPEG,bicycle
 test_000119.JPEG,clock
 test_000120.JPEG,bear
@@ -144,7 +144,7 @@ test_000142.JPEG,car
 test_000143.JPEG,car
 test_000144.JPEG,Knife
 test_000145.JPEG,bear
-test_000146.JPEG,boat
+test_000146.JPEG,airplane
 test_000147.JPEG,bicycle
 test_000148.JPEG,boat
 test_000149.JPEG,Keyboard
@@ -174,7 +174,7 @@ test_000172.JPEG,elephant
 test_000173.JPEG,dog
 test_000174.JPEG,bicycle
 test_000175.JPEG,car
-test_000176.JPEG,bottle
+test_000176.JPEG,clock
 test_000177.JPEG,oven
 test_000178.JPEG,car
 test_000179.JPEG,elephant
@@ -262,7 +262,7 @@ test_000260.JPEG,truck
 test_000261.JPEG,oven
 test_000262.JPEG,bear
 test_000263.JPEG,chair
-test_000264.JPEG,airplane
+test_000264.JPEG,truck
 test_000265.JPEG,Knife
 test_000266.JPEG,bicycle
 test_000267.JPEG,elephant
@@ -277,7 +277,7 @@ test_000275.JPEG,bird
 test_000276.JPEG,bicycle
 test_000277.JPEG,oven
 test_000278.JPEG,bear
-test_000279.JPEG,clock
+test_000279.JPEG,Knife
 test_000280.JPEG,bird
 test_000281.JPEG,bear
 test_000282.JPEG,bird
@@ -330,7 +330,7 @@ test_000328.JPEG,bottle
 test_000329.JPEG,bear
 test_000330.JPEG,chair
 test_000331.JPEG,clock
-test_000332.JPEG,oven
+test_000332.JPEG,Knife
 test_000333.JPEG,truck
 test_000334.JPEG,Knife
 test_000335.JPEG,bird
@@ -413,7 +413,7 @@ test_000411.JPEG,clock
 test_000412.JPEG,clock
 test_000413.JPEG,oven
 test_000414.JPEG,Knife
-test_000415.JPEG,bear
+test_000415.JPEG,dog
 test_000416.JPEG,Keyboard
 test_000417.JPEG,boat
 test_000418.JPEG,airplane
@@ -509,7 +509,7 @@ test_000507.JPEG,bicycle
 test_000508.JPEG,chair
 test_000509.JPEG,Knife
 test_000510.JPEG,bird
-test_000511.JPEG,oven
+test_000511.JPEG,clock
 test_000512.JPEG,car
 test_000513.JPEG,boat
 test_000514.JPEG,bicycle
@@ -605,9 +605,9 @@ test_000603.JPEG,elephant
 test_000604.JPEG,airplane
 test_000605.JPEG,clock
 test_000606.JPEG,boat
-test_000607.JPEG,bottle
+test_000607.JPEG,Knife
 test_000608.JPEG,chair
-test_000609.JPEG,bottle
+test_000609.JPEG,Knife
 test_000610.JPEG,boat
 test_000611.JPEG,airplane
 test_000612.JPEG,bicycle
@@ -702,7 +702,7 @@ test_000700.JPEG,chair
 test_000701.JPEG,Keyboard
 test_000702.JPEG,airplane
 test_000703.JPEG,Knife
-test_000704.JPEG,bottle
+test_000704.JPEG,clock
 test_000705.JPEG,bicycle
 test_000706.JPEG,elephant
 test_000707.JPEG,cat
@@ -812,11 +812,11 @@ test_000810.JPEG,cat
 test_000811.JPEG,dog
 test_000812.JPEG,clock
 test_000813.JPEG,bicycle
-test_000814.JPEG,dog
+test_000814.JPEG,Keyboard
 test_000815.JPEG,boat
 test_000816.JPEG,bottle
 test_000817.JPEG,oven
-test_000818.JPEG,boat
+test_000818.JPEG,oven
 test_000819.JPEG,oven
 test_000820.JPEG,car
 test_000821.JPEG,bottle
@@ -1016,7 +1016,7 @@ test_001014.JPEG,bear
 test_001015.JPEG,oven
 test_001016.JPEG,airplane
 test_001017.JPEG,Keyboard
-test_001018.JPEG,elephant
+test_001018.JPEG,bear
 test_001019.JPEG,Knife
 test_001020.JPEG,chair
 test_001021.JPEG,oven
@@ -1121,7 +1121,7 @@ test_001119.JPEG,boat
 test_001120.JPEG,truck
 test_001121.JPEG,bottle
 test_001122.JPEG,elephant
-test_001123.JPEG,car
+test_001123.JPEG,truck
 test_001124.JPEG,elephant
 test_001125.JPEG,cat
 test_001126.JPEG,oven
@@ -1180,7 +1180,7 @@ test_001178.JPEG,bottle
 test_001179.JPEG,dog
 test_001180.JPEG,cat
 test_001181.JPEG,bird
-test_001182.JPEG,bottle
+test_001182.JPEG,Keyboard
 test_001183.JPEG,cat
 test_001184.JPEG,bird
 test_001185.JPEG,bear
@@ -1189,7 +1189,7 @@ test_001187.JPEG,boat
 test_001188.JPEG,Knife
 test_001189.JPEG,dog
 test_001190.JPEG,dog
-test_001191.JPEG,Knife
+test_001191.JPEG,bottle
 test_001192.JPEG,Knife
 test_001193.JPEG,bottle
 test_001194.JPEG,bird
@@ -1261,7 +1261,7 @@ test_001259.JPEG,bicycle
 test_001260.JPEG,truck
 test_001261.JPEG,cat
 test_001262.JPEG,elephant
-test_001263.JPEG,car
+test_001263.JPEG,boat
 test_001264.JPEG,chair
 test_001265.JPEG,boat
 test_001266.JPEG,bottle
@@ -1332,7 +1332,7 @@ test_001330.JPEG,car
 test_001331.JPEG,bottle
 test_001332.JPEG,bicycle
 test_001333.JPEG,oven
-test_001334.JPEG,cat
+test_001334.JPEG,airplane
 test_001335.JPEG,bicycle
 test_001336.JPEG,bird
 test_001337.JPEG,elephant
@@ -1418,7 +1418,7 @@ test_001416.JPEG,bear
 test_001417.JPEG,cat
 test_001418.JPEG,elephant
 test_001419.JPEG,bear
-test_001420.JPEG,Knife
+test_001420.JPEG,Keyboard
 test_001421.JPEG,bicycle
 test_001422.JPEG,elephant
 test_001423.JPEG,bear
@@ -1548,7 +1548,7 @@ test_001546.JPEG,truck
 test_001547.JPEG,truck
 test_001548.JPEG,bottle
 test_001549.JPEG,Keyboard
-test_001550.JPEG,Knife
+test_001550.JPEG,clock
 test_001551.JPEG,chair
 test_001552.JPEG,bear
 test_001553.JPEG,dog
@@ -1592,7 +1592,7 @@ test_001590.JPEG,dog
 test_001591.JPEG,boat
 test_001592.JPEG,car
 test_001593.JPEG,Keyboard
-test_001594.JPEG,chair
+test_001594.JPEG,bicycle
 test_001595.JPEG,bear
 test_001596.JPEG,bicycle
 test_001597.JPEG,bird
